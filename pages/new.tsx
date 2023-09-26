@@ -1,19 +1,18 @@
-import Form from '../components/Form'
+import UserForm from '../components/UserForm'
 
-const NewPet = () => {
-  const petForm = {
-    name: '',
-    owner_name: '',
-    species: '',
-    age: 0,
-    poddy_trained: false,
-    diet: [],
-    image_url: '',
-    likes: [],
-    dislikes: [],
+const NewUser = () => {
+  const userForm = {
+    username: '',
+    email: '',
+    phone_num: 0,
+    skillset: [],
+    hobby: []
   }
 
-  return <Form formId="add-pet-form" petForm={petForm} />
+  return <div>
+    <h2>Fill the form below to add a new developer</h2>
+    <UserForm formId="add-user-form" userForm={userForm} />
+  </div>
 }
 
-export default NewPet
+export default NewUser

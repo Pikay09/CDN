@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import dbConnect from '../../lib/dbConnect'
-import Pet, { Pets } from '../../models/Pet'
+import User, { Users } from '../../models/User'
 import { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import { ParsedUrlQuery } from 'querystring'
 
@@ -11,56 +11,61 @@ interface Params extends ParsedUrlQuery {
 }
 
 type Props = {
-  pet: Pets
+  user: Users
 }
 
-/* Allows you to view pet card info and delete pet card*/
-const PetPage = ({ pet }: Props) => {
+/* Allows you to view user card info and delete user card*/
+const userPage = ({ user }: Props) => {
   const router = useRouter()
   const [message, setMessage] = useState('')
   const handleDelete = async () => {
-    const petID = router.query.id
+    const userID = router.query.id
 
     try {
-      await fetch(`/api/pets/${petID}`, {
+      await fetch(`/api/users/${userID}`, {
         method: 'Delete',
       })
       router.push('/')
     } catch (error) {
-      setMessage('Failed to delete the pet.')
+      setMessage('Failed to delete the user.')
     }
   }
 
   return (
-    <div key={pet._id}>
+    <div key={user._id}>
       <div className="card">
-        <img src={pet.image_url} />
-        <h5 className="pet-name">{pet.name}</h5>
+        <h5 className="user-name">{user.username}</h5>
         <div className="main-content">
-          <p className="pet-name">{pet.name}</p>
-          <p className="owner">Owner: {pet.owner_name}</p>
+            <br/>
+          <p className="user-name">
+            Developer name is
+            <br/>
+            {user.username}</p>
+            <br/>
+          <p className="owner">Email : {user.email}</p>
+          <p className="owner">Phone No. : {user.phone_num}</p>
 
-          {/* Extra Pet Info: Likes and Dislikes */}
+          {/* Extra user Info: Hobby and Skillset */}
           <div className="likes info">
-            <p className="label">Likes</p>
+            <p className="label">Skills</p>
             <ul>
-              {pet.likes.map((data, index) => (
+              {user.skillset? user.skillset.map((data, index) => (
                 <li key={index}>{data} </li>
-              ))}
+              )): "no info"}
             </ul>
           </div>
           <div className="dislikes info">
-            <p className="label">Dislikes</p>
+            <p className="label">Hobby</p>
             <ul>
-              {pet.dislikes.map((data, index) => (
+              {user.hobby? user.hobby.map((data, index) => (
                 <li key={index}>{data} </li>
-              ))}
+              )): "no info"}
             </ul>
           </div>
 
           <div className="btn-container">
-            <Link href={`/${pet._id}/edit`}>
-              <button className="btn edit">Edit</button>
+            <Link href={`/${user._id}/edit`}>
+              <button className="btn edit">Edit User</button>
             </Link>
             <button className="btn delete" onClick={handleDelete}>
               Delete
@@ -84,22 +89,22 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({
     }
   }
 
-  const pet = await Pet.findById(params.id).lean()
+  const user = await User.findById(params.id).lean()
 
-  if (!pet) {
+  if (!user) {
     return {
       notFound: true,
     }
   }
 
   /* Ensures all objectIds and nested objectIds are serialized as JSON data */
-  const serializedPet = JSON.parse(JSON.stringify(pet))
+  const serializedUser = JSON.parse(JSON.stringify(user))
 
   return {
     props: {
-      pet: serializedPet,
+      user: serializedUser,
     },
   }
 }
 
-export default PetPage
+export default userPage

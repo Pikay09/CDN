@@ -3,7 +3,7 @@ declare global {
   var mongoose: any // This must be a `var` and not a `let / const`
 }
 
-const MONGODB_URI = process.env.MONGODB_URI!
+const MONGODB_URI = process.env.MONGO_DB!
 
 if (!MONGODB_URI) {
   throw new Error(
@@ -26,8 +26,11 @@ async function dbConnect() {
       bufferCommands: false,
     }
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      console.log("COnnected")
       return mongoose
     })
+  } else {
+    console.log("Caution, check connection")
   }
   try {
     cached.conn = await cached.promise

@@ -1,48 +1,50 @@
 import Link from 'next/link'
 import dbConnect from '../lib/dbConnect'
-import Pet, { Pets } from '../models/Pet'
+import User, { Users } from '../models/User'
+import HiringModal from '../components/HiringModal'
 import { GetServerSideProps } from 'next'
 
 type Props = {
-  pets: Pets[]
+  users: Users[]
 }
 
-const Index = ({ pets }: Props) => {
+const Index = ({ users }: Props) => {
   return (
     <>
-      {pets.map((pet) => (
-        <div key={pet._id}>
+      {users.map((user) => (
+        <div key={user._id}>
           <div className="card">
-            <img src={pet.image_url} />
-            <h5 className="pet-name">{pet.name}</h5>
+            <h5 className="user-name">{user.username}</h5>
             <div className="main-content">
-              <p className="pet-name">{pet.name}</p>
-              <p className="owner">Owner: {pet.owner_name}</p>
-
-              {/* Extra Pet Info: Likes and Dislikes */}
+                <br/>
+              <p className="user-name">
+                Developer name is
+                <br/>
+                {user.username}</p>
+                <br/>
+              <p className="owner">Email : {user.email}</p>
+              <p className="owner">Mobile No. : {user.phone_num}</p>
               <div className="likes info">
-                <p className="label">Likes</p>
+              <p className="label">Skills</p>
                 <ul>
-                  {pet.likes.map((data, index) => (
+                  {user.skillset? user.skillset.map((data, index) => (
                     <li key={index}>{data} </li>
-                  ))}
+                  )): "no info"}
                 </ul>
               </div>
               <div className="dislikes info">
-                <p className="label">Dislikes</p>
+                <p className="label">Hobbies</p>
                 <ul>
-                  {pet.dislikes.map((data, index) => (
+                  {user.hobby? user.hobby.map((data, index) => (
                     <li key={index}>{data} </li>
-                  ))}
+                  )): "no info"}
                 </ul>
               </div>
 
               <div className="btn-container">
-                <Link href={{ pathname: '/[id]/edit', query: { id: pet._id } }}>
-                  <button className="btn edit">Edit</button>
-                </Link>
-                <Link href={{ pathname: '/[id]', query: { id: pet._id } }}>
-                  <button className="btn view">View</button>
+              <HiringModal id={user._id} dev={user.username}/>
+                <Link href={{ pathname: '/[id]', query: { id: user._id } }}>
+                  <button className="btn view">Details</button>
                 </Link>
               </div>
             </div>
@@ -53,20 +55,20 @@ const Index = ({ pets }: Props) => {
   )
 }
 
-/* Retrieves pet(s) data from mongodb database */
+/* Retrieves user(s) data from mongodb database */
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   await dbConnect()
 
   /* find all the data in our database */
-  const result = await Pet.find({})
+  const result = await User.find({})
 
   /* Ensures all objectIds and nested objectIds are serialized as JSON data */
-  const pets = result.map((doc) => {
-    const pet = JSON.parse(JSON.stringify(doc))
-    return pet
+  const users = result.map((doc) => {
+    const user = JSON.parse(JSON.stringify(doc))
+    return user
   })
 
-  return { props: { pets: pets } }
+  return { props: { users: users } }
 }
 
 export default Index

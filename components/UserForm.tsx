@@ -1,48 +1,42 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { mutate } from 'swr'
+import PhoneInput from 'react-phone-number-input/input'
+
 
 interface FormData {
-  name: string
-  owner_name: string
-  species: string
-  age: number
-  poddy_trained: boolean
-  diet: string[]
-  image_url: string
-  likes: string[]
-  dislikes: string[]
+  username: string
+  email: string
+  phone_num : number
+  skillset: string[]
+  hobby : string[]
 }
 
 interface Error {
   name?: string
-  owner_name?: string
-  species?: string
-  image_url?: string
+  phone_num?: string
+  email?: string
+  skillset?: string
 }
 
 type Props = {
   formId: string
-  petForm: FormData
-  forNewPet?: boolean
+  userForm: FormData
+  forNewUser?: boolean
 }
 
-const Form = ({ formId, petForm, forNewPet = true }: Props) => {
+const UserForm = ({ formId, userForm, forNewUser = true }: Props) => {
   const router = useRouter()
   const contentType = 'application/json'
   const [errors, setErrors] = useState({})
   const [message, setMessage] = useState('')
 
   const [form, setForm] = useState({
-    name: petForm.name,
-    owner_name: petForm.owner_name,
-    species: petForm.species,
-    age: petForm.age,
-    poddy_trained: petForm.poddy_trained,
-    diet: petForm.diet,
-    image_url: petForm.image_url,
-    likes: petForm.likes,
-    dislikes: petForm.dislikes,
+    username: userForm.username,
+    phone_num : userForm.phone_num,
+    email: userForm.email,
+    skillset: userForm.skillset,
+    hobby: userForm.hobby
   })
 
   /* The PUT method edits an existing entry in the mongodb database. */
@@ -50,7 +44,7 @@ const Form = ({ formId, petForm, forNewPet = true }: Props) => {
     const { id } = router.query
 
     try {
-      const res = await fetch(`/api/pets/${id}`, {
+      const res = await fetch(`/api/users/${id}`, {
         method: 'PUT',
         headers: {
           Accept: contentType,
@@ -66,17 +60,17 @@ const Form = ({ formId, petForm, forNewPet = true }: Props) => {
 
       const { data } = await res.json()
 
-      mutate(`/api/pets/${id}`, data, false) // Update the local data without a revalidation
+      mutate(`/api/users/${id}`, data, false) // Update the local data without a revalidation
       router.push('/')
     } catch (error) {
-      setMessage('Failed to update pet')
+      setMessage('Failed to update user')
     }
   }
 
   /* The POST method adds a new entry in the mongodb database. */
   const postData = async (form: FormData) => {
     try {
-      const res = await fetch('/api/pets', {
+      const res = await fetch('/api/users', {
         method: 'POST',
         headers: {
           Accept: contentType,
@@ -92,7 +86,7 @@ const Form = ({ formId, petForm, forNewPet = true }: Props) => {
 
       router.push('/')
     } catch (error) {
-      setMessage('Failed to add pet')
+      setMessage('Failed to add user')
     }
   }
 
@@ -101,7 +95,7 @@ const Form = ({ formId, petForm, forNewPet = true }: Props) => {
   ) => {
     const target = e.target
     const value =
-      target.name === 'poddy_trained'
+      target.name === 'checker'
         ? (target as HTMLInputElement).checked
         : target.value
     const name = target.name
@@ -112,13 +106,13 @@ const Form = ({ formId, petForm, forNewPet = true }: Props) => {
     })
   }
 
-  /* Makes sure pet info is filled for pet name, owner name, species, and image url*/
+  /* Makes sure user info is filled for user name, owner name, species, and image url*/
   const formValidate = () => {
     let err: Error = {}
-    if (!form.name) err.name = 'Name is required'
-    if (!form.owner_name) err.owner_name = 'Owner is required'
-    if (!form.species) err.species = 'Species is required'
-    if (!form.image_url) err.image_url = 'Image URL is required'
+    if (!form.username) err.name = 'Name is required'
+    if (!form.phone_num) err.phone_num = 'Email is required'
+    if (!form.email) err.email = 'Email is required'
+    if (!form.skillset) err.skillset = 'Atleast 1 skillset is required'
     return err
   }
 
@@ -127,7 +121,7 @@ const Form = ({ formId, petForm, forNewPet = true }: Props) => {
     const errs = formValidate()
 
     if (Object.keys(errs).length === 0) {
-      forNewPet ? postData(form) : putData(form)
+      forNewUser ? postData(form) : putData(form)
     } else {
       setErrors({ errs })
     }
@@ -136,83 +130,55 @@ const Form = ({ formId, petForm, forNewPet = true }: Props) => {
   return (
     <>
       <form id={formId} onSubmit={handleSubmit}>
-        <label htmlFor="name">Name</label>
+        <label htmlFor="username">Full Name</label>
         <input
           type="text"
           maxLength={20}
-          name="name"
-          value={form.name}
+          name="username"
+          value={form.username}
           onChange={handleChange}
+          placeholder='example : John Smith'
           required
         />
 
-        <label htmlFor="owner_name">Owner</label>
-        <input
-          type="text"
-          maxLength={20}
-          name="owner_name"
-          value={form.owner_name}
-          onChange={handleChange}
-          required
-        />
-
-        <label htmlFor="species">Species</label>
-        <input
-          type="text"
-          maxLength={30}
-          name="species"
-          value={form.species}
-          onChange={handleChange}
-          required
-        />
-
-        <label htmlFor="age">Age</label>
+        <label htmlFor="phone_num">Contact Number</label>
         <input
           type="number"
-          name="age"
-          value={form.age}
+          maxLength={10}
+          minLength={9}
+          name="phone_num"
+          value={form.phone_num}
           onChange={handleChange}
+          placeholder='+60123456789'
+          required
         />
-
-        <label htmlFor="poddy_trained">Potty Trained</label>
+        <label htmlFor="email">Email</label>
         <input
-          type="checkbox"
-          name="poddy_trained"
-          checked={form.poddy_trained}
+          type="email"
+          maxLength={30}
+          name="email"
+          value={form.email}
           onChange={handleChange}
-        />
-
-        <label htmlFor="diet">Diet</label>
-        <textarea
-          name="diet"
-          maxLength={60}
-          value={form.diet}
-          onChange={handleChange}
-        />
-
-        <label htmlFor="image_url">Image URL</label>
-        <input
-          type="url"
-          name="image_url"
-          value={form.image_url}
-          onChange={handleChange}
+          placeholder='exampl@web.com'
           required
         />
 
-        <label htmlFor="likes">Likes</label>
-        <textarea
-          name="likes"
-          maxLength={60}
-          value={form.likes}
+        <label htmlFor="skills">Skills</label>
+        <input
+          type="text"
+          name="skillset"
+          value={form.skillset}
           onChange={handleChange}
+          placeholder='Coding, Desiging, Painting'
         />
 
-        <label htmlFor="dislikes">Dislikes</label>
-        <textarea
-          name="dislikes"
-          maxLength={60}
-          value={form.dislikes}
+        <label htmlFor="hobby">Hobby</label>
+        <input
+          type="text"
+          name="hobby"
+          value={form.hobby}
           onChange={handleChange}
+          placeholder='cleaning, singing, hiking'
         />
 
         <button type="submit" className="btn">
@@ -229,4 +195,4 @@ const Form = ({ formId, petForm, forNewPet = true }: Props) => {
   )
 }
 
-export default Form
+export default UserForm
