@@ -23,7 +23,7 @@ export default function ButtonAppBar() {
           >
             <img
             id="title"
-            src="https://isilive.ca/wp-content/uploads/CDN-logo-848x281.png"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNe2BdLaA7wuHvt7Nvq-PtdSiauzLPmqs1cpGOYXDxr7QctXrpnXqA4gijSDhXKI5RJP4&usqp=CAU"
             alt="user care logo"
             ></img>
             {/* <MenuIcon /> */}
